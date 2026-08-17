@@ -1,0 +1,15 @@
+{
+  "name": "privacy-intelligence-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Privacy Intelligence Platform monorepo",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "dev:backend": "npm run dev --workspace=@privacy-intelligence/backend",
+    "start:backend": "npm run start --workspace=@privacy-intelligence/backend"
+  },
+  "engines": { "node": ">=20.19.0" }
+}

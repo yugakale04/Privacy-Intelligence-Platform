@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Intelligence Platform</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Privacy Intelligence</h1>
+      <p class="motto">Read the policy. Understand the risk.</p>
+      <section aria-labelledby="site-heading">
+        <h2 id="site-heading">Current website</h2>
+        <dl>
+          <div><dt>Title</dt><dd id="page-title">Loading…</dd></div>
+          <div><dt>Domain</dt><dd id="hostname">Loading…</dd></div>
+          <div><dt>URL</dt><dd id="url">Loading…</dd></div>
+        </dl>
+      </section>
+      <section aria-labelledby="status-heading">
+        <h2 id="status-heading">Extension status</h2>
+        <p id="status" data-state="ready">Loading active tab information…</p>
+      </section>
+      <button id="analyze-button" type="button">Analyze Page</button>
+      <p id="result" class="result">Page information will appear here.</p>
+      <p id="backend-result" class="result">Backend response will appear here.</p>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

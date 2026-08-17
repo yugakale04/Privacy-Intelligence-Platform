@@ -1,0 +1,19 @@
+{
+  "name": "@privacy-intelligence/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node --env-file-if-exists=.env scripts/build.mjs && npm run typecheck && npm run validate:build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "validate": "node scripts/validate-manifest.mjs public/manifest.json",
+    "validate:build": "node scripts/validate-manifest.mjs dist/manifest.json"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.311",
+    "esbuild": "^0.25.9",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

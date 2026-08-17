@@ -1,0 +1,13 @@
+:root { color: #172033; font-family: Arial, sans-serif; }
+body { margin: 0; min-width: 330px; background: #f7f9fc; }
+main { padding: 16px; }
+h1 { margin: 0; font-size: 18px; }
+h2 { margin: 16px 0 6px; font-size: 14px; }
+.motto, .result { color: #526075; font-size: 12px; }
+dl { margin: 0; }
+dl div { margin: 6px 0; }
+dt { color: #526075; font-size: 12px; }
+dd { margin: 1px 0 0; font-size: 13px; overflow-wrap: anywhere; }
+#status[data-state="error"] { color: #9c2e2e; }
+#backend-result[data-state="error"] { color: #9c2e2e; }
+button { width: 100%; margin-top: 12px; padding: 9px; border: 0; border-radius: 4px; background: #2855a6; color: white; cursor: pointer; }

@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Privacy Intelligence Platform",
+  "description": "Read the Privacy Policy. Understand the Risk. Protect the User.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "Privacy Intelligence Platform",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["http://127.0.0.1:3000/*"]
+}
