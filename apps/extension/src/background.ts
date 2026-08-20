@@ -1,13 +1,17 @@
 import {
   failure,
+  isExtractPrivacyPolicyMessage,
   isExtensionMessage,
   isPageInfoResponse,
+  isPrivacyPolicyDetectionResponse,
   MESSAGE_TYPES,
   type ActiveTabResponse,
   type AnalyzePageResponse,
-  type PageInfoResponse
+  type PageInfoResponse,
+  type PolicyExtractionResponse,
+  type PrivacyPolicyDetectionResponse
 } from "./messages.js";
-import { sendPageInfo } from "./api-client.js";
+import { extractPolicy, sendPageInfo } from "./api-client.js";
 import { isSupportedPage, toTabInfo, type TabInfo } from "./tab-info.js";
 
 const MESSAGE_TIMEOUT_MS = 5_000;
@@ -28,7 +32,7 @@ function withTimeout<T>(operation: Promise<T>): Promise<T> {
   });
 }
 
-function isFailure(value: TabInfo | PageInfoResponse | ReturnType<typeof failure>): value is ReturnType<typeof failure> {
+function isFailure(value: TabInfo | PageInfoResponse | PrivacyPolicyDetectionResponse | ReturnType<typeof failure>): value is ReturnType<typeof failure> {
   return "ok" in value && value.ok === false;
 }
 
@@ -100,6 +104,26 @@ async function requestPageInfo(tabId: number): Promise<PageInfoResponse> {
   }
 }
 
+async function requestPrivacyPolicyDetection(tabId: number): Promise<PrivacyPolicyDetectionResponse> {
+  try {
+    const response: unknown = await withTimeout(chrome.tabs.sendMessage(tabId, { type: MESSAGE_TYPES.findPrivacyPolicy }));
+    return isPrivacyPolicyDetectionResponse(response)
+      ? response
+      : failure("MESSAGE_FAILURE", "The page returned an invalid policy-detection response.");
+  } catch {
+    const injectionFailure = await injectContentScript(tabId);
+    if (injectionFailure) return injectionFailure;
+    try {
+      const response: unknown = await withTimeout(chrome.tabs.sendMessage(tabId, { type: MESSAGE_TYPES.findPrivacyPolicy }));
+      return isPrivacyPolicyDetectionResponse(response)
+        ? response
+        : failure("MESSAGE_FAILURE", "The page returned an invalid policy-detection response.");
+    } catch (error) {
+      return messageFailure(error);
+    }
+  }
+}
+
 async function analyzePage(): Promise<AnalyzePageResponse> {
   const tab = await getCurrentTab();
   if (isFailure(tab)) {
@@ -116,6 +140,21 @@ async function analyzePage(): Promise<AnalyzePageResponse> {
     hasReadableText: pageInfo.hasMeaningfulReadableText
   });
   return { ok: true, pageInfo, backend, message: "Page information received." };
+}
+
+async function findPrivacyPolicy(): Promise<PrivacyPolicyDetectionResponse> {
+  const tab = await getCurrentTab();
+  if (isFailure(tab)) return tab;
+  return requestPrivacyPolicyDetection(tab.id);
+}
+
+async function extractPrivacyPolicy(policyUrl: string): Promise<PolicyExtractionResponse> {
+  try {
+    new URL(policyUrl);
+  } catch {
+    return failure("INVALID_MESSAGE", "A valid privacy-policy URL is required.");
+  }
+  return extractPolicy(policyUrl);
 }
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -135,6 +174,24 @@ chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) =
     void analyzePage().then(sendResponse).catch((error: unknown) => {
       console.error("Page information request failed.", error);
       sendResponse(failure("MESSAGE_FAILURE", "Unable to retrieve page information."));
+    });
+    return true;
+  }
+  if (message.type === MESSAGE_TYPES.findPrivacyPolicy) {
+    void findPrivacyPolicy().then(sendResponse).catch((error: unknown) => {
+      console.error("Privacy-policy detection request failed.", error);
+      sendResponse(failure("MESSAGE_FAILURE", "Unable to detect a privacy policy."));
+    });
+    return true;
+  }
+  if (message.type === MESSAGE_TYPES.extractPrivacyPolicy) {
+    if (!isExtractPrivacyPolicyMessage(message)) {
+      sendResponse(failure("INVALID_MESSAGE", "A valid privacy-policy URL is required."));
+      return false;
+    }
+    void extractPrivacyPolicy(message.policyUrl).then(sendResponse).catch((error: unknown) => {
+      console.error("Privacy-policy extraction request failed.", error);
+      sendResponse(failure("MESSAGE_FAILURE", "Unable to extract the privacy policy."));
     });
     return true;
   }

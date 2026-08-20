@@ -1,5 +1,6 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { registerPageInfoRoute } from "./routes/page-info.js";
+import { registerPolicyExtractRoute } from "./routes/policy-extract.js";
 
 function isValidationError(error: unknown): error is { validation: unknown } {
   return Boolean(error && typeof error === "object" && "validation" in error && (error as { validation?: unknown }).validation);
@@ -14,13 +15,14 @@ export function buildApp(): FastifyInstance {
   }));
 
   void app.register(registerPageInfoRoute);
+  void app.register(registerPolicyExtractRoute);
 
   app.setErrorHandler((error, _request, reply) => {
     app.log.error(error);
     if (isValidationError(error)) {
       return reply.status(400).send({
         error: "validation_error",
-        message: "Invalid page information request."
+        message: "Invalid API request."
       });
     }
     return reply.status(500).send({

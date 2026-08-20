@@ -26,3 +26,7 @@ The initial development plan labeled the shared schema as module 2. The requeste
 ## M3 extension communication
 
 M3 uses structured runtime messages and a five-second timeout. The service worker is the only component that forwards the popup request to the active tab's content script. It reinjects that script once when no receiver exists, while preserving the existing `activeTab` and `scripting` permission boundary. The content script returns metadata and a boolean readability signal only; it does not extract or retain page text.
+
+## M5 local privacy-policy detection
+
+M5 adds a deterministic local detector. A candidate earns confidence from explicit privacy-policy/notice labels, a privacy-oriented URL path, and—only for the current page—policy-related title/text signals. Cookie-only pages and likely blog, article, tips, guide, news, and marketing links are excluded. Scores are capped at 100, duplicate resolved URLs keep the highest-scoring candidate, and results use descending confidence followed by URL as a stable tie-breaker. The content script retains and returns only the ranked candidate metadata; it never sends full page text or the page link list to the backend.

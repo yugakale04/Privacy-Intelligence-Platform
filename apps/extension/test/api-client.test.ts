@@ -41,4 +41,19 @@ describe("backend API client", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}", { status: 200 })));
     await expect(sendPageInfo(pageInfo)).resolves.toMatchObject({ ok: false, code: "INVALID_BACKEND_RESPONSE" });
   });
+
+  it("submits only a policy URL and validates extraction responses", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      success: true,
+      policy: { url: "https://example.com/privacy", finalUrl: "https://example.com/privacy", title: "Privacy Policy", text: "Policy text", wordCount: 2, characterCount: 11 },
+      structuredPolicy: { totalWordCount: 2, sections: [{ heading: "Privacy Policy" }], chunks: [{}] }
+    }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { extractPolicy } = await import("../src/api-client.js");
+
+    await expect(extractPolicy("https://example.com/privacy")).resolves.toMatchObject({ ok: true, policy: { title: "Privacy Policy" } });
+    expect(fetchMock).toHaveBeenCalledWith("http://127.0.0.1:3000/api/v1/policy/extract", expect.objectContaining({
+      body: JSON.stringify({ policyUrl: "https://example.com/privacy" })
+    }));
+  });
 });

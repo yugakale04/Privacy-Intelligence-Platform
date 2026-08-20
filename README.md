@@ -60,6 +60,16 @@ The popup sends `ANALYZE_PAGE` to the service worker, which sends `GET_PAGE_INFO
 
 Start the backend with `npm run dev:backend` before testing **Analyze Page**. After the local page-information result appears, the popup separately displays the backend response. Stop the backend and click **Analyze Page** again to verify the controlled backend connection error.
 
+## Test local privacy-policy detection
+
+Click **Find Privacy Policy** on a normal `http` or `https` webpage. Detection runs locally in the content script and does not send page text or links to the backend. The popup displays whether a policy was found, the best candidate URL, confidence, and reason. Test a policy page directly, a site homepage with a policy-footer link, and a page with no policy link. On a restricted browser page, confirm the existing controlled inaccessible-page error appears.
+
+## Test privacy-policy extraction
+
+Keep the backend running, click **Find Privacy Policy**, then click **Extract Selected Policy**. The extension sends only the selected policy URL to `POST /api/v1/policy/extract`. The popup displays the extracted title, word count, final URL, and a short preview. Reload the unpacked extension after each build. Test a valid public policy page and an extraction failure (for example, stop the backend) to confirm the controlled error state.
+
+The extraction response is also processed into stable sections and bounded chunks on the backend. The popup shows only the structured summary: total words, section count, chunk count, and section headings; it does not display the full processed policy.
+
 With the backend running, verify it with:
 
 ```bash

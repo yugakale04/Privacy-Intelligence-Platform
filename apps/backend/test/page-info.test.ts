@@ -42,7 +42,7 @@ describe("POST /api/v1/page-info", () => {
     expect(response.statusCode).toBe(400);
     expect(response.json()).toEqual({
       error: "validation_error",
-      message: "Invalid page information request."
+      message: "Invalid API request."
     });
   });
 });

@@ -60,3 +60,7 @@ The extension does not contain API keys. Browser permissions must be justified b
 - The backend is the sole trust boundary for secrets, external AI calls, and analysis rules.
 - The risk engine scores structured findings, not raw AI assertions.
 - The explanation layer may simplify results but must cite existing evidence and disclose uncertainty.
+
+## Finding and evidence contract
+
+All future privacy analyzers use the shared `Finding` and `Evidence` contract. A finding is limited to a controlled privacy category, severity, confidence from 0 to 1, a plain statement, and one or more evidence items. Each evidence item references an M7 `sectionId` and `chunkId`; validation verifies that the chunk belongs to that section. This shared contract is serialized for future backend/API and frontend use. Risk and summary fields are reserved in `AnalysisResult` but are not populated until their dedicated modules.
