@@ -1,6 +1,7 @@
 import { BACKEND_BASE_URL } from "./config.js";
 
 const API_TIMEOUT_MS = 5_000;
+const POLICY_EXTRACTION_TIMEOUT_MS = 15_000;
 
 export interface PageInfoSubmission {
   title: string;
@@ -97,7 +98,7 @@ function isStructuredPolicySummary(value: unknown): value is StructuredPolicySum
 
 export async function extractPolicy(policyUrl: string): Promise<BackendPolicyExtractionResponse> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), POLICY_EXTRACTION_TIMEOUT_MS);
   try {
     const response = await fetch(`${BACKEND_BASE_URL}/api/v1/policy/extract`, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ policyUrl }), signal: controller.signal

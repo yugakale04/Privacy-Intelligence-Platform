@@ -2,7 +2,7 @@
 
 ## Current state
 
-M0 through M7 are complete. M8 privacy finding and evidence data modeling is implemented and has passed automated validation; future analyzer modules can now emit validated, evidence-linked findings.
+M0 through M9 are complete. M10 policy storage now persists versioned extraction snapshots through the existing backend flow without changing the M9 extraction response.
 
 ## Implementation modules
 
@@ -17,10 +17,11 @@ M0 through M7 are complete. M8 privacy finding and evidence data modeling is imp
 | M6 | Privacy-policy extraction | COMPLETED |
 | M7 | Privacy-policy text processing and structuring | COMPLETED |
 | M8 | Privacy finding and evidence data model | COMPLETED |
-| M9 | Privacy analyzer foundation | NEXT |
-| 10 | Extension integration | NOT STARTED |
-| 11 | Privacy, security, and retention hardening | NOT STARTED |
+| M9 | Policy extraction hardening and validation | COMPLETED |
+| M10 | Policy storage | COMPLETED |
+| M11 | Extension integration | NOT STARTED |
+| M12 | Privacy, security, and retention hardening | NOT STARTED |
 
 ## First module to implement
 
-**M9 - Privacy analyzer foundation.** Build only the first explicitly approved analyzer using M8 findings and evidence contracts.
+M10 policy snapshots are stored by requested URL, versioned on text-hash changes, and retrievable by policy ID.

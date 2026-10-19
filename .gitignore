@@ -2,6 +2,7 @@
 node_modules/
 dist/
 coverage/
+apps/backend/data/
 
 # Environment files
 .env

@@ -10,14 +10,18 @@
 
 ## Boundaries preserved
 
-The backend remains the sole future location for secrets and third-party AI integrations. The extension remains free of API keys and currently performs no collection, detection, or network activity. Data storage, authentication, and databases are deferred.
+The backend remains the sole future location for secrets and third-party AI integrations. The extension remains free of API keys and currently performs no collection, detection, or network activity. Database-backed storage and authentication remain deferred; M10 adds backend-local JSON persistence for extracted policy snapshots without a database dependency.
 
 ## Deferred decisions
 
 - Popup/UI framework and build tooling (likely React + Vite when M10 is implemented).
 - API schema validation library (M2 defines the shared schema contract first).
 - CORS policy (needed only when an extension module makes backend requests).
-- Persistence, AI/ML providers, authentication, and policy-analysis logic.
+- Database-backed persistence, AI/ML providers, authentication, and policy-analysis logic.
+
+## M10 policy snapshot storage
+
+Extracted policy snapshots are stored in a backend-owned JSON file using Node's built-in filesystem and cryptographic APIs. SHA-256 of the canonical requested URL identifies a policy record; SHA-256 of extracted text determines whether a new content version is needed. This minimal single-process store avoids a database dependency and can later be replaced behind the policy store boundary.
 
 ## M2 module-numbering adjustment
 

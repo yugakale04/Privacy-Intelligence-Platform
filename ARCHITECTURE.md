@@ -37,7 +37,7 @@ The extension obtains page context and displays results. The backend performs po
 | Privacy analysis | Identify supported statements and emit structured, evidence-linked findings. |
 | Risk engine | Apply documented rules to findings and return a score plus contributors. |
 | AI explanation layer | Explain evidence-backed findings in plain language; never add unsupported facts. |
-| Database (deferred) | Store only data required by a later approved module, with retention controls. |
+| Policy store | Persist extracted policy snapshots in the backend-owned local JSON store; the database remains deferred. |
 
 ## Analysis pipeline
 
@@ -53,6 +53,18 @@ Every intermediate result must preserve enough source context to link a displaye
 4. The service worker relays the result to the popup/UI for the current site.
 
 The extension does not contain API keys. Browser permissions must be justified by a concrete module requirement.
+
+### Policy extraction API
+
+`POST /api/v1/policy/extract` accepts `{ "policyUrl": "https://example.com/privacy" }`. The backend retrieves the document; the extension sends the candidate URL, not the current page's HTML or full text. Successful responses retain the existing `{ success, policy, structuredPolicy }` envelope. `policy` contains the requested URL, validated final redirect URL, title, readable text, and its word and character counts.
+
+The backend accepts only public HTTP(S) destinations, resolves and pins public DNS addresses for each hop, validates every redirect before connecting, and applies a total request timeout and response-size limit. It parses HTML without executing scripts and returns controlled errors for invalid, unavailable, unsupported, oversized, or unreadable documents.
+
+### Policy storage
+
+Successful extraction and processing persist a versioned snapshot in `apps/backend/data/policies.json` by default. Set `POLICY_STORAGE_PATH` to use another file. The file is backend-owned and excluded from version control. A record ID is the SHA-256 hash of the canonical requested URL; its content hash is the SHA-256 hash of extracted text. Repeated requests with unchanged text return the existing record without creating a version. Changed text replaces the current record and increments its version.
+
+`GET /api/v1/policy/{policyId}` retrieves a saved record. Storage enforces a 2,000,000-character text limit, serializes operations within one backend process, and uses atomic file replacement. This local file store avoids a new database dependency; it is not encrypted, multi-process, or a substitute for a production database with access controls and retention policies.
 
 ## Responsibility boundaries
 
